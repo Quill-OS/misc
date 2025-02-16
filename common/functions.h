@@ -28,6 +28,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <spawn.h>
+#include <math.h>
 
 // Macros
 #define MATCH(s1, s2) ((s1 != NULL && s2 != NULL) && strcmp(s1, s2) == 0)
@@ -52,10 +53,15 @@
         const char * const args[] = { prog, ##__VA_ARGS__, NULL }; \
 	run_command(prog, args, true); \
 })
+#define SYSFS_BUF_SIZE 128
+#define INFO_OK 0
+#define INFO_WARNING 1
+#define INFO_FATAL 2
 
 // Functions
 long int run_command(const char * path, const char * const arguments[], bool wait);
 char * read_file(const char * file_path, bool strip_newline);
+char * read_sysfs_file(const char * path);
 bool write_file(const char * file_path, const char * content);
 bool copy_file(const char * source_file, const char * destination_file);
 int mkpath(const char * path, mode_t mode);

@@ -1,4 +1,5 @@
 #include "functions.h"
+extern char * device;
 
 #define initModule(module_image, len, param_values) syscall(__NR_init_module, module_image, len, param_values)
 #define INFO_OK 0
@@ -89,6 +90,36 @@ char * read_file(const char * file_path, bool strip_newline) {
 cleanup:
 	fclose(fp);
 	return buffer; // May be NULL (indicates failure)
+}
+
+// Thanks, ChatGPT ...
+char * read_sysfs_file(const char *path) {
+    int fd = open(path, O_RDONLY);
+    if (fd < 0) {
+        perror("open");
+        return NULL;
+    }
+
+    char *buf = malloc(SYSFS_BUF_SIZE);
+    if (!buf) {
+        perror("malloc");
+        close(fd);
+        return NULL;
+    }
+
+    ssize_t nbytes = read(fd, buf, SYSFS_BUF_SIZE - 1);
+    if (nbytes < 0) {
+        perror("read");
+        free(buf);
+        close(fd);
+        return NULL;
+    }
+
+    // Null-terminate the buffer
+    buf[nbytes] = '\0';
+
+    close(fd);
+    return buf;
 }
 
 // https://stackoverflow.com/a/14576624/14164574
@@ -267,4 +298,74 @@ int info(const char * message, int mode) {
 		return 1;
 	}
 	return 0;
+}
+
+int get_brightness(int mode) {
+	int brightness;
+	if(mode == 0) {
+		if(MATCH(device, "n613")) {
+			brightness = (int)read_sysfs_file("/data/config/03-brightness/config");
+		}
+		else if(MATCH(device, "n236") || MATCH(device, "n437")) {
+			brightness = (int)read_sysfs_file("/sys/class/backlight/mxc_msp430_fl.0/brightness");
+		}
+		else if(MATCH(device, "n249")) {
+			brightness = (int)read_sysfs_file("/sys/class/backlight/backlight_cold/actual_brightness");
+		}
+		else if(MATCH(device, "n418")) {
+			brightness = round((float)atof(read_sysfs_file("/sys/class/leds/aw99703-bl_FL2/brightness"))/2047*100);
+		}
+		else {
+			brightness = (int)read_sysfs_file("/sys/class/backlight/mxc_msp430.0/brightness");
+		}
+	}
+	else {
+		if(MATCH(device, "n249")) {
+			brightness = (int)read_sysfs_file("/sys/class/backlight/backlight_warm/actual_brightness");
+		}
+		else if(MATCH(device, "n418")) {
+			brightness = round((float)atof(read_sysfs_file("/sys/class/leds/aw99703-bl_FL1/brightness"))/2047*100);
+		}
+	}
+	return brightness;
+}
+
+void set_brightness_ntxio(int value) {
+	// Thanks to Kevin Short for this (GloLight)
+	int light;
+	if((light = open("/dev/ntx_io", O_RDWR)) == -1) {
+		fprintf(stderr, "Error opening ntx_io device\n");
+	}
+	ioctl(light, 241, value);
+	close(light);
+}
+
+void set_brightness(int brightness, int mode) {
+	char brightness_char[10];
+	if(MATCH(device, "n418")) {
+		brightness = round((float)brightness/100*2047);
+	}
+	sprintf(brightness_char, "%d\n", brightness);
+	if(mode == 0) {
+		if(MATCH(device, "n613")) {
+			set_brightness_ntxio(brightness);
+		}
+		else if(MATCH(device, "n249")) {
+			write_file("/sys/class/backlight/backlight_cold/brightness", brightness_char);
+		}
+		else if(MATCH(device, "n418")) {
+			write_file("/sys/class/leds/aw99703-bl_FL2/brightness", brightness_char);
+		}
+		else {
+			write_file("/sys/class/backlight/mxc_msp430.0/brightness", brightness_char);
+		}
+	}
+	else {
+		if(MATCH(device, "n249")) {
+			write_file("/sys/class/backlight/backlight_warm/brightness", brightness_char);
+		}
+		else if(MATCH(device, "n418")) {
+			write_file("/sys/class/leds/aw99703-bl_FL1/brightness", brightness_char);
+		}
+	}
 }
