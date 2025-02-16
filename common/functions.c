@@ -304,24 +304,24 @@ int get_brightness(int mode) {
 	int brightness;
 	if(mode == 0) {
 		if(MATCH(device, "n613")) {
-			brightness = (int)read_sysfs_file("/data/config/03-brightness/config");
+			brightness = atoi(read_file("/data/config/03-brightness/config", true));
 		}
 		else if(MATCH(device, "n236") || MATCH(device, "n437")) {
-			brightness = (int)read_sysfs_file("/sys/class/backlight/mxc_msp430_fl.0/brightness");
+			brightness = atoi(read_sysfs_file("/sys/class/backlight/mxc_msp430_fl.0/brightness"));
 		}
 		else if(MATCH(device, "n249")) {
-			brightness = (int)read_sysfs_file("/sys/class/backlight/backlight_cold/actual_brightness");
+			brightness = atoi(read_sysfs_file("/sys/class/backlight/backlight_cold/actual_brightness"));
 		}
 		else if(MATCH(device, "n418")) {
 			brightness = round((float)atof(read_sysfs_file("/sys/class/leds/aw99703-bl_FL2/brightness"))/2047*100);
 		}
 		else {
-			brightness = (int)read_sysfs_file("/sys/class/backlight/mxc_msp430.0/brightness");
+			brightness = atoi(read_sysfs_file("/sys/class/backlight/mxc_msp430.0/brightness"));
 		}
 	}
 	else {
 		if(MATCH(device, "n249")) {
-			brightness = (int)read_sysfs_file("/sys/class/backlight/backlight_warm/actual_brightness");
+			brightness = atoi(read_sysfs_file("/sys/class/backlight/backlight_warm/actual_brightness"));
 		}
 		else if(MATCH(device, "n418")) {
 			brightness = round((float)atof(read_sysfs_file("/sys/class/leds/aw99703-bl_FL1/brightness"))/2047*100);
