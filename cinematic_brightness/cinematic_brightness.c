@@ -13,7 +13,9 @@ int main(int argc, char ** argv) {
         cinematic_brightness(atoi(argv[2]), atoi(argv[4]), 1, atoi(argv[5]));
     }
     else {
-        cinematic_brightness(atoi(argv[2]), atoi(argv[4]), 1, atoi(argv[5]));
+        if(MATCH(device, "n249") || MATCH(device, "n418")) {
+            cinematic_brightness(atoi(argv[2]), atoi(argv[4]), 1, atoi(argv[5]));
+        }
         cinematic_brightness(atoi(argv[1]), atoi(argv[3]), 0, atoi(argv[5]));
     }
 }
