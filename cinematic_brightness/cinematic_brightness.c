@@ -33,7 +33,7 @@ void cinematic_brightness(int level_to_set, int current_level, int type, int del
         }
         set_brightness(current_level, type);
         if(delay == -1) {
-            delay = 5000;
+            delay = 3000;
         }
         usleep(delay);
     }
