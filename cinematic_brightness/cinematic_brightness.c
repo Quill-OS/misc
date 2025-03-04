@@ -8,18 +8,12 @@ int main(int argc, char ** argv) {
     // level_to_set (cold)  level_to_set (warm)  current_level (cold)  current_level(warm)  delay (microseconds)
     //
     // **** NOTE: if current_level(*) is set to -1, the program will attempt to retrieve the current brightness/warmth automatically. ****
-    if(MATCH(device, "n873")) {
-        cinematic_brightness(atoi(argv[1]), atoi(argv[3]), 0, atoi(argv[5]));
-        cinematic_brightness(atoi(argv[2]), atoi(argv[4]), 1, atoi(argv[5]));
+    if((MATCH(device, "n873") || MATCH(device, "n418")) && get_brightness(0) == 0) {
+        set_brightness(atoi(argv[2]), 1);
     }
-    else {
-        if(MATCH(device, "n249")) {
-            cinematic_brightness(atoi(argv[2]), atoi(argv[4]), 1, atoi(argv[5]));
-        }
-        if(MATCH(device, "n418") && get_brightness(0) == 0) {
-            set_brightness(atoi(argv[2]), 1);
-        }
-        cinematic_brightness(atoi(argv[1]), atoi(argv[3]), 0, atoi(argv[5]));
+    cinematic_brightness(atoi(argv[1]), atoi(argv[3]), 0, atoi(argv[5]));
+    if(MATCH(device, "n249")) {
+        cinematic_brightness(atoi(argv[2]), atoi(argv[4]), 1, atoi(argv[5]));
     }
 }
 

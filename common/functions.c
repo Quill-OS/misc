@@ -124,6 +124,7 @@ char * read_sysfs_file(const char *path) {
 
 // https://stackoverflow.com/a/14576624/14164574
 bool write_file(const char * file_path, const char * content) {
+	// printf("Writing %s to %s\n", file_path, content);
 	FILE *file = fopen(file_path, "wb");
 	if(!file) {
 		return false;
