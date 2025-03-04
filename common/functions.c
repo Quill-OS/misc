@@ -51,6 +51,10 @@ long int run_command(const char * path, const char * const arguments[], bool wai
 	return pid;
 }
 
+int file_exists(const char * file_path) {
+	return(access(file_path, F_OK));
+}
+
 // https://stackoverflow.com/a/3747128/14164574
 char * read_file(const char * file_path, bool strip_newline) {
 	// Ensure that specified file exists, then try to read it
@@ -325,10 +329,10 @@ int get_brightness(int mode) {
 			brightness = atoi(read_sysfs_file("/sys/class/backlight/backlight_warm/actual_brightness"));
 		}
 		else if(MATCH(device, "n418")) {
-			brightness = 10 - atoi(read_sysfs_file("/sys/class/leds/aw99703-bl_FL1/color"));
+			brightness = 10 * (10 - atoi(read_sysfs_file("/sys/class/leds/aw99703-bl_FL1/color")));
 		}
 		else if(MATCH(device, "n873")) {
-			brightness = 10 - atoi(read_sysfs_file("/sys/class/backlight/lm3630a_led/color"));
+			brightness = 10 * (10 - atoi(read_sysfs_file("/sys/class/backlight/lm3630a_led/color")));
 		}
 	}
 	return brightness;

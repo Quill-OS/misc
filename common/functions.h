@@ -60,6 +60,7 @@
 
 // Functions
 long int run_command(const char * path, const char * const arguments[], bool wait);
+int file_exists(const char * file_path);
 char * read_file(const char * file_path, bool strip_newline);
 char * read_sysfs_file(const char * path);
 bool write_file(const char * file_path, const char * content);
