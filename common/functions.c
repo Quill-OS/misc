@@ -313,7 +313,7 @@ int get_brightness(int mode) {
 			brightness = atoi(read_sysfs_file("/sys/class/backlight/backlight_cold/actual_brightness"));
 		}
 		else if(MATCH(device, "n418")) {
-			brightness = round((float)atof(read_sysfs_file("/sys/class/leds/aw99703-bl_FL2/brightness"))/2047*100);
+			brightness = atoi(read_sysfs_file("/sys/class/backlight/mxc_msp430.0/actual_brightness"));
 		}
 		else {
 			brightness = atoi(read_sysfs_file("/sys/class/backlight/mxc_msp430.0/brightness"));
@@ -324,7 +324,7 @@ int get_brightness(int mode) {
 			brightness = atoi(read_sysfs_file("/sys/class/backlight/backlight_warm/actual_brightness"));
 		}
 		else if(MATCH(device, "n418")) {
-			brightness = round((float)atof(read_sysfs_file("/sys/class/leds/aw99703-bl_FL1/brightness"))/2047*100);
+			brightness = 10 - atoi(read_sysfs_file("/sys/class/leds/aw99703-bl_FL1/color"));
 		}
 		else if(MATCH(device, "n873")) {
 			brightness = 10 - atoi(read_sysfs_file("/sys/class/backlight/lm3630a_led/color"));
@@ -345,12 +345,11 @@ void set_brightness_ntxio(int value) {
 
 void set_brightness(int brightness, int mode) {
 	char brightness_char[10];
-	if(MATCH(device, "n418")) {
-		brightness = round((float)brightness/100*2047);
-	}
-	else if(MATCH(device, "n873") && mode != 0) {
-		brightness = 10 - 0.1 * brightness;
-	}
+        if(mode != 0) {
+            if(MATCH(device, "n873") || MATCH(device, "n418")) {
+                brightness = 10 - 0.1 * brightness;
+            }
+        }
 	sprintf(brightness_char, "%d\n", brightness);
 	if(mode == 0) {
 		if(MATCH(device, "n613")) {
@@ -358,9 +357,6 @@ void set_brightness(int brightness, int mode) {
 		}
 		else if(MATCH(device, "n249")) {
 			write_file("/sys/class/backlight/backlight_cold/brightness", brightness_char);
-		}
-		else if(MATCH(device, "n418")) {
-			write_file("/sys/class/leds/aw99703-bl_FL2/brightness", brightness_char);
 		}
 		else {
 			write_file("/sys/class/backlight/mxc_msp430.0/brightness", brightness_char);
@@ -371,7 +367,7 @@ void set_brightness(int brightness, int mode) {
 			write_file("/sys/class/backlight/backlight_warm/brightness", brightness_char);
 		}
 		else if(MATCH(device, "n418")) {
-			write_file("/sys/class/leds/aw99703-bl_FL1/brightness", brightness_char);
+			write_file("/sys/class/leds/aw99703-bl_FL1/color", brightness_char);
 		}
 		else if(MATCH(device, "n873")) {
 			write_file("/sys/class/backlight/lm3630a_led/color", brightness_char);
