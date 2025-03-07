@@ -312,7 +312,7 @@ int get_brightness(int mode) {
 			brightness = atoi(read_file("/data/config/03-brightness/config", true));
 		}
 		else if(MATCH(device, "n236") || MATCH(device, "n437")) {
-			brightness = atoi(read_sysfs_file("/sys/class/backlight/mxc_msp430_fl.0/brightness"));
+			brightness = atoi(read_sysfs_file("/sys/class/backlight/mxc_msp430_fl.0/actual_brightness"));
 		}
 		else if(MATCH(device, "n249")) {
 			brightness = atoi(read_sysfs_file("/sys/class/backlight/backlight_cold/actual_brightness"));
@@ -356,6 +356,9 @@ void set_brightness(int brightness, int mode) {
 	if(mode == 0) {
 		if(MATCH(device, "n613")) {
 			set_brightness_ntxio(brightness);
+		}
+		else if(MATCH(device, "n236") || MATCH(device, "n437")) {
+			write_file("/sys/class/backlight/mxc_msp430_fl.0/brightness", brightness_char);
 		}
 		else if(MATCH(device, "n249")) {
 			write_file("/sys/class/backlight/backlight_cold/brightness", brightness_char);
